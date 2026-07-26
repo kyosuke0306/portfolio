@@ -491,9 +491,19 @@
   }
 
   // ============================================
+  // Init (view)
+  // ============================================
+  document.getElementById("year").textContent = new Date().getFullYear();
+  renderAll();
+
+  // 閲覧専用ページ（index.html）には編集UIが無いので、ここで終了する。
+  // 編集UIを含むのはローカル専用の edit.html のみ。
+  const overlay = document.getElementById("editorOverlay");
+  if (!overlay) return;
+
+  // ============================================
   // EDITOR: open/close + tabs
   // ============================================
-  const overlay = document.getElementById("editorOverlay");
   const editBtn = document.getElementById("editModeBtn");
   const closeBtn = document.getElementById("closeEditorBtn");
 
@@ -1037,7 +1047,7 @@
   });
 
   // ============================================
-  // Init
+  // Init (editor)
   // ============================================
   ["skillDate", "personalityDate", "certDate", "projDate"].forEach((id) => {
     document.getElementById(id).innerHTML = yearOptionsHtml("");
@@ -1047,7 +1057,4 @@
   });
   document.getElementById("careerStartYear").innerHTML = yearOptionsHtml("");
   document.getElementById("careerEndYear").innerHTML = yearOptionsHtml("", { withPresent: true });
-
-  document.getElementById("year").textContent = new Date().getFullYear();
-  renderAll();
 })();

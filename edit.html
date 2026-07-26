@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>編集用（ローカル専用） | ポートフォリオ</title>
+<meta name="robots" content="noindex" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="edit-banner">
+    編集用プレビュー（ローカル専用）— 変更はこのブラウザにのみ保存されます。公開サイトに反映するには JSON を書き出して app.js の初期値に反映してください。
+  </div>
+
+  <header class="site-header">
+    <span class="logo">Portfolio<span class="dot">.</span></span>
+    <nav class="site-nav">
+      <a href="#hero">TOP</a>
+      <a href="#about">プロフィール</a>
+      <a href="#works">実績</a>
+    </nav>
+    <button id="editModeBtn" class="icon-btn" title="プロフィールを編集" aria-label="プロフィール編集を開く">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9c.14.36.4.66.74.85.34.2.72.27 1.1.24H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      <span>編集</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- HERO / ORBITAL SECTION -->
+    <section class="hero" id="hero">
+      <div class="orbit-stage" id="orbitStage">
+        <svg class="orbit-lines" id="orbitLines"></svg>
+
+        <div class="ring-guide"></div>
+
+        <div class="avatar-core" id="avatarCore">
+          <div class="avatar-frame" id="avatarFrame">
+            <span class="avatar-initials" id="avatarInitials">井恭</span>
+          </div>
+        </div>
+
+        <div class="orbit-nodes" id="orbitNodes"></div>
+      </div>
+
+      <div class="hero-caption">
+        <h1 class="profile-name" id="profileName">井川　恭輔</h1>
+        <p class="profile-title" id="profileTitle">フロントエンドエンジニア</p>
+      </div>
+
+      <div class="hero-legend">
+        <span class="legend-item"><i class="legend-dot legend-dot--skills"></i>スキル</span>
+        <span class="legend-item"><i class="legend-dot legend-dot--personality"></i>性格</span>
+        <span class="legend-item"><i class="legend-dot legend-dot--certs"></i>資格</span>
+        <span class="legend-item"><i class="legend-dot legend-dot--career"></i>経歴</span>
+      </div>
+
+      <a href="#works" class="scroll-cue" aria-label="実績セクションへスクロール">
+        <span></span>
+      </a>
+    </section>
+
+    <!-- ABOUT / BIO -->
+    <section class="about" id="about">
+      <h2 class="section-title">プロフィール</h2>
+      <p class="bio-text" id="bioText">
+        システムエンジニアです。
+      </p>
+
+      <div class="about-grid">
+        <div class="about-block">
+          <h3 class="block-title"><i class="dot legend-dot--skills"></i>スキル</h3>
+          <div class="badge-grid" id="skillsGrid"></div>
+        </div>
+        <div class="about-block">
+          <h3 class="block-title"><i class="dot legend-dot--personality"></i>性格</h3>
+          <div class="badge-grid" id="personalityGrid"></div>
+        </div>
+        <div class="about-block">
+          <h3 class="block-title"><i class="dot legend-dot--certs"></i>資格</h3>
+          <div class="badge-grid" id="certsGrid"></div>
+        </div>
+      </div>
+
+      <div class="about-block">
+        <h3 class="block-title"><i class="dot legend-dot--career"></i>経歴</h3>
+        <div class="career-list" id="careerList"></div>
+      </div>
+    </section>
+
+    <!-- WORKS -->
+    <section class="works" id="works">
+      <h2 class="section-title">実績</h2>
+      <div class="project-grid" id="projectGrid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> <span id="footerName">井川　恭輔</span>. Vanilla HTML / CSS / JS で制作。</p>
+  </footer>
+
+  <!-- EDITOR MODAL -->
+  <div class="editor-overlay" id="editorOverlay">
+    <div class="editor-panel" role="dialog" aria-modal="true" aria-label="プロフィール編集">
+      <div class="editor-header">
+        <h2>プロフィール編集</h2>
+        <button class="icon-btn icon-btn--close" id="closeEditorBtn" aria-label="編集画面を閉じる">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="editor-tabs" id="editorTabs">
+        <button class="tab-btn active" data-tab="profile">プロフィール</button>
+        <button class="tab-btn" data-tab="skills">スキル</button>
+        <button class="tab-btn" data-tab="personality">性格</button>
+        <button class="tab-btn" data-tab="certifications">資格</button>
+        <button class="tab-btn" data-tab="career">経歴</button>
+        <button class="tab-btn" data-tab="projects">実績</button>
+      </div>
+
+      <div class="editor-body">
+
+        <!-- PROFILE TAB -->
+        <div class="tab-panel active" data-panel="profile">
+          <label class="field">
+            <span>名前</span>
+            <input type="text" id="inputName" maxlength="40" placeholder="お名前" />
+          </label>
+          <label class="field">
+            <span>肩書き・役職</span>
+            <input type="text" id="inputTitle" maxlength="60" placeholder="例: フロントエンドエンジニア" />
+          </label>
+          <label class="field">
+            <span>自己紹介</span>
+            <textarea id="inputBio" rows="4" maxlength="500" placeholder="簡単な自己紹介を入力してください"></textarea>
+          </label>
+          <label class="field">
+            <span>アバター画像</span>
+            <input type="file" id="inputAvatar" accept="image/*" />
+          </label>
+          <div class="field-row">
+            <button class="btn btn--ghost" id="removeAvatarBtn" type="button">画像を削除</button>
+          </div>
+        </div>
+
+        <!-- SKILLS TAB -->
+        <div class="tab-panel" data-panel="skills">
+          <ul class="editable-list" id="skillsList"></ul>
+          <form class="add-form" id="skillsForm">
+            <input type="text" id="skillInput" maxlength="40" placeholder="スキル・強みを追加" required />
+            <select id="skillDate" class="date-select"></select>
+            <select id="skillMonth" class="date-select month-select"></select>
+            <textarea id="skillNote" rows="2" maxlength="300" placeholder="補足（任意）"></textarea>
+            <button type="button" id="skillStatus" class="status-toggle" data-status="current">現状</button>
+            <button type="submit" class="btn btn--accent">追加</button>
+          </form>
+        </div>
+
+        <!-- PERSONALITY TAB -->
+        <div class="tab-panel" data-panel="personality">
+          <ul class="editable-list" id="personalityList"></ul>
+          <form class="add-form" id="personalityForm">
+            <input type="text" id="personalityInput" maxlength="40" placeholder="性格・人柄を追加" required />
+            <select id="personalityDate" class="date-select"></select>
+            <select id="personalityMonth" class="date-select month-select"></select>
+            <textarea id="personalityNote" rows="2" maxlength="300" placeholder="補足（任意）"></textarea>
+            <button type="button" id="personalityStatus" class="status-toggle" data-status="current">現状</button>
+            <button type="submit" class="btn btn--accent">追加</button>
+          </form>
+        </div>
+
+        <!-- CERTIFICATIONS TAB -->
+        <div class="tab-panel" data-panel="certifications">
+          <ul class="editable-list" id="certsList"></ul>
+          <form class="add-form" id="certsForm">
+            <input type="text" id="certInput" maxlength="60" placeholder="資格を追加" required />
+            <select id="certDate" class="date-select"></select>
+            <select id="certMonth" class="date-select month-select"></select>
+            <textarea id="certNote" rows="2" maxlength="300" placeholder="補足（任意）"></textarea>
+            <button type="button" id="certStatus" class="status-toggle" data-status="current">現状</button>
+            <button type="submit" class="btn btn--accent">追加</button>
+          </form>
+        </div>
+
+        <!-- CAREER TAB -->
+        <div class="tab-panel" data-panel="career">
+          <ul class="editable-list editable-list--career" id="careerEditList"></ul>
+          <form class="add-form add-form--career" id="careerForm">
+            <div class="form-row form-row--period">
+              <select id="careerStartYear" class="date-select" required></select>
+              <select id="careerStartMonth" class="date-select month-select"></select>
+              <span class="period-sep">〜</span>
+              <select id="careerEndYear" class="date-select"></select>
+              <select id="careerEndMonth" class="date-select month-select"></select>
+            </div>
+            <input type="text" id="careerRole" maxlength="60" placeholder="役職" required />
+            <input type="text" id="careerOrg" maxlength="60" placeholder="組織名・会社名" required />
+            <textarea id="careerNote" rows="2" maxlength="300" placeholder="補足（任意）"></textarea>
+            <button type="button" id="careerStatus" class="status-toggle" data-status="current">現状（経歴）</button>
+            <button type="submit" class="btn btn--accent">追加</button>
+          </form>
+        </div>
+
+        <!-- PROJECTS TAB -->
+        <div class="tab-panel" data-panel="projects">
+          <ul class="editable-list editable-list--projects" id="projectsEditList"></ul>
+          <form class="add-form add-form--projects" id="projectsForm">
+            <input type="text" id="projTitle" maxlength="60" placeholder="作品名（プログラム・イラストなど）" required />
+            <div class="form-row">
+              <select id="projDate" class="date-select"></select>
+              <select id="projMonth" class="date-select month-select"></select>
+            </div>
+            <textarea id="projDesc" rows="2" maxlength="300" placeholder="説明" required></textarea>
+            <textarea id="projNote" rows="2" maxlength="300" placeholder="補足（任意）"></textarea>
+            <input type="text" id="projTech" maxlength="120" placeholder="タグ・使用ツール（カンマ区切り 例: Web開発, React / イラスト, Procreate）" />
+            <input type="url" id="projLink" placeholder="リンク（https://...）" />
+            <label class="field">
+              <span>サムネイル画像</span>
+              <input type="file" id="projThumb" accept="image/*" />
+            </label>
+            <button type="button" id="projStatus" class="status-toggle" data-status="current">現状（実績）</button>
+            <button type="submit" class="btn btn--accent">作品を追加</button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="editor-footer">
+        <p class="editor-footer__note">入力内容はこのブラウザにのみ保存されます。書き出したJSONを app.js の初期値に反映すると、公開サイトの全員に表示されます。</p>
+        <div class="editor-footer__actions">
+          <button class="btn btn--ghost" id="exportDataBtn" type="button">JSONを書き出し</button>
+          <button class="btn btn--ghost" id="importDataBtn" type="button">JSONを読み込み</button>
+          <input type="file" id="importDataInput" accept="application/json,.json" hidden />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

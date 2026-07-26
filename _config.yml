@@ -1,0 +1,5 @@
+# edit.html はローカル専用の編集ツール。
+# Git では管理するが、GitHub Pages で公開するファイルからは除外する。
+exclude:
+  - edit.html
+  - README.md
