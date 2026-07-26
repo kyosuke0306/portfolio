@@ -124,7 +124,22 @@ button, input, textarea {
   color: var(--text);
 }
 
-.icon-btn {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.github-link {
+  text-decoration: none;
+}
+
+.github-link[hidden] {
+  display: none;
+}
+
+.icon-btn,
+.github-link {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -138,7 +153,8 @@ button, input, textarea {
   transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
 
-.icon-btn:hover {
+.icon-btn:hover,
+.github-link:hover {
   background: var(--surface-hover);
   border-color: var(--border-strong);
   transform: translateY(-1px);

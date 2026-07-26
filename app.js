@@ -12,7 +12,7 @@
   // 表示内容の実データは data.json が唯一の情報源。
   // これは data.json を読み込めなかった場合にだけ使う空の骨組み。
   const defaultData = {
-    profile: { name: "", title: "", bio: "", avatar: null },
+    profile: { name: "", title: "", bio: "", github: "", avatar: null },
     skills: [],
     personality: [],
     certifications: [],
@@ -221,6 +221,16 @@
     });
   }
 
+  // http(s) 以外（javascript: など）を href に入れないための保険。
+  function safeUrl(url) {
+    try {
+      const parsed = new URL(String(url || "").trim());
+      return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : "";
+    } catch {
+      return "";
+    }
+  }
+
   // ============================================
   // RENDER: Profile core
   // ============================================
@@ -229,6 +239,11 @@
     document.getElementById("profileTitle").textContent = state.profile.title;
     document.getElementById("footerName").textContent = state.profile.name;
     document.getElementById("bioText").textContent = state.profile.bio;
+
+    const githubLink = document.getElementById("githubLink");
+    const githubUrl = safeUrl(state.profile.github);
+    githubLink.href = githubUrl;
+    githubLink.hidden = !githubUrl;
 
     const frame = document.getElementById("avatarFrame");
     const initialsEl = document.getElementById("avatarInitials");
@@ -670,6 +685,7 @@
   const inputName = document.getElementById("inputName");
   const inputTitle = document.getElementById("inputTitle");
   const inputBio = document.getElementById("inputBio");
+  const inputGithub = document.getElementById("inputGithub");
   const inputAvatar = document.getElementById("inputAvatar");
   const removeAvatarBtn = document.getElementById("removeAvatarBtn");
 
@@ -677,6 +693,7 @@
     inputName.value = state.profile.name;
     inputTitle.value = state.profile.title;
     inputBio.value = state.profile.bio;
+    inputGithub.value = state.profile.github;
   }
 
   function updateProfileField(field, value) {
@@ -688,6 +705,7 @@
   inputName.addEventListener("input", () => updateProfileField("name", inputName.value.trim() || defaultData.profile.name));
   inputTitle.addEventListener("input", () => updateProfileField("title", inputTitle.value.trim()));
   inputBio.addEventListener("input", () => updateProfileField("bio", inputBio.value));
+  inputGithub.addEventListener("input", () => updateProfileField("github", inputGithub.value.trim()));
 
   inputAvatar.addEventListener("change", async () => {
     const file = inputAvatar.files[0];
