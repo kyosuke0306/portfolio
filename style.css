@@ -839,6 +839,7 @@ main section {
 }
 
 .editor-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -852,6 +853,7 @@ main section {
 }
 
 .editor-tabs {
+  flex-shrink: 0;
   display: flex;
   gap: 4px;
   padding: 14px 20px 0;
@@ -882,8 +884,31 @@ main section {
 }
 
 .editor-body {
+  flex: 1;
+  min-height: 0;
   padding: 22px 26px 28px;
   overflow-y: auto;
+}
+
+.editor-footer {
+  flex-shrink: 0;
+  padding: 16px 26px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-footer__note {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.editor-footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .tab-panel {

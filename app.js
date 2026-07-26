@@ -175,19 +175,22 @@
     }));
   }
 
+  function normalizeData(parsed) {
+    return {
+      profile: { ...defaultData.profile, ...(parsed.profile || {}) },
+      skills: normalizeLabelItems(parsed.skills, defaultData.skills),
+      personality: normalizeLabelItems(parsed.personality, defaultData.personality),
+      certifications: normalizeLabelItems(parsed.certifications, defaultData.certifications),
+      career: normalizeCareer(parsed.career),
+      projects: normalizeProjects(parsed.projects),
+    };
+  }
+
   function loadData() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return structuredClone(defaultData);
-      const parsed = JSON.parse(raw);
-      return {
-        profile: { ...defaultData.profile, ...(parsed.profile || {}) },
-        skills: normalizeLabelItems(parsed.skills, defaultData.skills),
-        personality: normalizeLabelItems(parsed.personality, defaultData.personality),
-        certifications: normalizeLabelItems(parsed.certifications, defaultData.certifications),
-        career: normalizeCareer(parsed.career),
-        projects: normalizeProjects(parsed.projects),
-      };
+      return normalizeData(JSON.parse(raw));
     } catch {
       return structuredClone(defaultData);
     }
@@ -515,6 +518,43 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && overlay.classList.contains("open")) closeEditor();
+  });
+
+  // ============================================
+  // EDITOR: export / import
+  // ============================================
+  const exportDataBtn = document.getElementById("exportDataBtn");
+  const importDataBtn = document.getElementById("importDataBtn");
+  const importDataInput = document.getElementById("importDataInput");
+
+  exportDataBtn.addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "portfolio-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  importDataBtn.addEventListener("click", () => importDataInput.click());
+
+  importDataInput.addEventListener("change", async () => {
+    const file = importDataInput.files[0];
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        throw new Error("invalid shape");
+      }
+      state = normalizeData(parsed);
+      persist();
+      renderAll();
+      openEditor();
+    } catch {
+      alert("JSONファイルを読み込めませんでした。書き出したファイルか確認してください。");
+    }
+    importDataInput.value = "";
   });
 
   document.getElementById("editorTabs").addEventListener("click", (e) => {
