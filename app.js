@@ -176,17 +176,63 @@
 
   let state = structuredClone(defaultData);
 
+  // localStorage は 5MB 程度で上限に達する。失敗を黙って飲み込むと
+  // 「保存したつもりが消えている」状態になるので、必ず呼び出し側へ伝える。
+  let onPersistError = null; // 編集ページ側で画面に出すためのフック
+
   function persist() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      return { ok: true };
+    } catch (err) {
+      console.error("下書きの保存に失敗しました:", err);
+      if (onPersistError) onPersistError(err);
+      return { ok: false, error: err };
+    }
   }
 
-  function readFileAsDataURL(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  // スマホの写真は 2MB を超えることが多く、base64 にすると更に 1.33 倍になる。
+  // 表示に必要な解像度まで縮小してから保存する。
+  const AVATAR_MAX_PX = 512;
+  const THUMBNAIL_MAX_PX = 1000;
+  const IMAGE_QUALITY = 0.82;
+
+  async function loadBitmap(file) {
+    // iPhone の写真は EXIF に回転情報を持つので from-image で反映させる。
+    if (window.createImageBitmap) {
+      try {
+        return await createImageBitmap(file, { imageOrientation: "from-image" });
+      } catch {
+        /* 未対応ブラウザは下の <img> 経路にフォールバックする */
+      }
+    }
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error("画像を読み込めませんでした"));
+        img.src = url;
+      });
+      return img;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function downscaleImage(file, maxPx) {
+    const source = await loadBitmap(file);
+    const width = source.width;
+    const height = source.height;
+    const scale = Math.min(1, maxPx / Math.max(width, height));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    canvas.getContext("2d").drawImage(source, 0, 0, canvas.width, canvas.height);
+    if (source.close) source.close();
+
+    return canvas.toDataURL("image/jpeg", IMAGE_QUALITY);
   }
 
   function escapeHtml(str) {
@@ -498,8 +544,9 @@
   }
 
   // 編集ページでは未公開の下書きを優先し、無ければ公開データから始める。
+  // published は「公開中の内容」の基準として保つので、state とは必ず別実体にする。
   const draft = overlay ? loadDraft() : null;
-  state = draft || published || structuredClone(defaultData);
+  state = draft || structuredClone(published || defaultData);
   renderAll();
 
   // 閲覧専用ページ（index.html）には編集UIが無いので、ここで終了する。
@@ -520,6 +567,7 @@
     renderCertsList();
     renderCareerEditList();
     renderProjectsEditList();
+    refreshDraftNotice();
   }
 
   function closeEditor() {
@@ -555,6 +603,37 @@
     publishStatus.textContent = message;
     publishStatus.className = "publish-status" + (kind ? ` publish-status--${kind}` : "");
   }
+
+  onPersistError = () => {
+    setPublishStatus(
+      "下書きを保存できませんでした（ブラウザの保存容量の上限）。画像の枚数を減らすか、既存の画像を削除してください。",
+      "error"
+    );
+  };
+
+  // 古い下書きをそのまま公開すると、他の端末で公開した内容を巻き戻してしまう。
+  const draftNotice = document.getElementById("draftNotice");
+  const resetDraftBtn = document.getElementById("resetDraftBtn");
+
+  function refreshDraftNotice() {
+    draftNotice.hidden = !published || JSON.stringify(state) === JSON.stringify(published);
+  }
+
+  refreshDraftNotice();
+
+  resetDraftBtn.addEventListener("click", () => {
+    if (!published) {
+      setPublishStatus("公開データを読み込めていないため、下書きを破棄できません。", "error");
+      return;
+    }
+    if (!confirm("下書きを破棄して、公開中の内容に戻します。よろしいですか？")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = structuredClone(published);
+    renderAll();
+    openEditor();
+    refreshDraftNotice();
+    setPublishStatus("下書きを破棄し、公開中の内容に戻しました。", "ok");
+  });
 
   saveTokenBtn.addEventListener("click", () => {
     const token = tokenInput.value.trim();
@@ -625,6 +704,8 @@
         }),
       });
 
+      published = structuredClone(state);
+      refreshDraftNotice();
       setPublishStatus("公開しました。1〜2分後に閲覧用サイトへ反映されます。", "ok");
     } catch (err) {
       setPublishStatus(`公開に失敗しました: ${err.message}`, "error");
@@ -710,8 +791,13 @@
   inputAvatar.addEventListener("change", async () => {
     const file = inputAvatar.files[0];
     if (!file) return;
-    state.profile.avatar = await readFileAsDataURL(file);
-    persist();
+    try {
+      state.profile.avatar = await downscaleImage(file, AVATAR_MAX_PX);
+    } catch (err) {
+      setPublishStatus(`画像を読み込めませんでした: ${err.message}`, "error");
+      return;
+    }
+    if (persist().ok) setPublishStatus("");
     renderProfile();
   });
 
@@ -1082,8 +1168,13 @@
         const file = input.files[0];
         if (!file) return;
         const idx = Number(input.dataset.index);
-        state.projects[idx].thumbnail = await readFileAsDataURL(file);
-        persist();
+        try {
+          state.projects[idx].thumbnail = await downscaleImage(file, THUMBNAIL_MAX_PX);
+        } catch (err) {
+          setPublishStatus(`画像を読み込めませんでした: ${err.message}`, "error");
+          return;
+        }
+        if (persist().ok) setPublishStatus("");
         renderProjectsEditList();
         renderProjects();
       });
@@ -1127,12 +1218,22 @@
     if (!title.value.trim() || !desc.value.trim()) return;
 
     const thumbFile = thumb.files[0];
+    let thumbnail = null;
+    if (thumbFile) {
+      try {
+        thumbnail = await downscaleImage(thumbFile, THUMBNAIL_MAX_PX);
+      } catch (err) {
+        setPublishStatus(`画像を読み込めませんでした: ${err.message}`, "error");
+        return;
+      }
+    }
+
     state.projects.push({
       title: title.value.trim(),
       description: desc.value.trim(),
       tech: tech.value.split(",").map((t) => t.trim()).filter(Boolean),
       link: link.value.trim(),
-      thumbnail: thumbFile ? await readFileAsDataURL(thumbFile) : null,
+      thumbnail,
       status: projStatusBtn.dataset.status,
       date: date.value.trim(),
       month: month.value,

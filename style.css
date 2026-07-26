@@ -963,6 +963,20 @@ main section {
   margin-bottom: 10px;
 }
 
+.draft-notice {
+  padding: 10px 12px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.draft-notice[hidden] {
+  display: none;
+}
+
 .publish-status {
   font-size: 0.78rem;
   line-height: 1.6;

@@ -259,8 +259,14 @@
           </div>
         </details>
 
+        <p class="draft-notice" id="draftNotice" hidden>
+          この下書きは公開中の内容と異なります。別の端末やブラウザで公開した変更が下書きに含まれていない場合、
+          このまま「公開する」と<strong>その変更が巻き戻ります</strong>。心当たりがあるときは先に下書きを破棄してください。
+        </p>
+
         <div class="editor-footer__actions">
           <button class="btn btn--accent" id="publishBtn" type="button">公開する</button>
+          <button class="btn btn--ghost" id="resetDraftBtn" type="button">下書きを破棄</button>
           <button class="btn btn--ghost" id="exportDataBtn" type="button">JSONを書き出し</button>
           <button class="btn btn--ghost" id="importDataBtn" type="button">JSONを読み込み</button>
           <input type="file" id="importDataInput" accept="application/json,.json" hidden />
