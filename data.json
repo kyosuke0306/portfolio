@@ -1,115 +1,13 @@
 {
   "profile": {
-    "name": "井川　恭輔",
-    "title": "フロントエンドエンジニア",
-    "bio": "システムエンジニアです。",
+    "name": "下書き 太郎",
+    "title": "下書き",
+    "bio": "下書きです",
     "avatar": null
   },
-  "skills": [
-    {
-      "label": "フロントエンド開発",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "UI / UX デザイン",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "ユーザー視点での設計",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "課題解決力",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    }
-  ],
-  "personality": [
-    {
-      "label": "誠実",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "粘り強い",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "好奇心旺盛",
-      "status": "current",
-      "date": "",
-      "month": "",
-      "note": ""
-    }
-  ],
-  "certifications": [
-    {
-      "label": "ITパスポート",
-      "status": "current",
-      "date": "2022",
-      "month": "",
-      "note": ""
-    },
-    {
-      "label": "基本情報技術者試験（FE）",
-      "status": "current",
-      "date": "2023",
-      "month": "",
-      "note": ""
-    }
-  ],
-  "career": [
-    {
-      "startYear": "2025",
-      "startMonth": "4",
-      "endYear": "2026",
-      "endMonth": "3",
-      "role": "エンジニア",
-      "org": "パーソルエクセルHRパートナーズ株式会社",
-      "status": "current",
-      "note": ""
-    },
-    {
-      "startYear": "2026",
-      "startMonth": "4",
-      "endYear": "present",
-      "endMonth": "",
-      "role": "フロントエンドエンジニア",
-      "org": "島精機製作所株式会社",
-      "status": "current",
-      "note": ""
-    }
-  ],
-  "projects": [
-    {
-      "title": "サンプル作品",
-      "description": "作品の概要や制作背景をここに入力します。プログラムでもイラストでも構いません。",
-      "tech": [
-        "Web開発",
-        "React"
-      ],
-      "link": "",
-      "thumbnail": null,
-      "status": "current",
-      "date": "2024",
-      "month": "",
-      "note": ""
-    }
-  ]
+  "skills": [],
+  "personality": [],
+  "certifications": [],
+  "career": [],
+  "projects": []
 }
