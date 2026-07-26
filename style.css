@@ -921,6 +921,47 @@ main section {
   gap: 10px;
 }
 
+.token-field summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.token-field summary:hover {
+  color: var(--text);
+}
+
+.token-field__help {
+  margin: 10px 0;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.token-field__help a {
+  color: var(--accent);
+}
+
+.token-field input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.publish-status {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  min-height: 1.2em;
+  color: var(--text-muted);
+}
+
+.publish-status--ok {
+  color: #4ade80;
+}
+
+.publish-status--error {
+  color: #f87171;
+}
+
 .tab-panel {
   display: none;
   flex-direction: column;
@@ -949,7 +990,8 @@ main section {
 .field textarea,
 .add-form input,
 .add-form textarea,
-.add-form select {
+.add-form select,
+.token-field input {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -964,7 +1006,8 @@ main section {
 .field textarea:focus,
 .add-form input:focus,
 .add-form textarea:focus,
-.add-form select:focus {
+.add-form select:focus,
+.token-field input:focus {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-hover);

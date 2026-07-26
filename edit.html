@@ -231,12 +231,30 @@
       </div>
 
       <div class="editor-footer">
-        <p class="editor-footer__note">入力内容はこのブラウザにのみ保存されます。書き出したJSONを app.js の初期値に反映すると、公開サイトの全員に表示されます。</p>
+        <p class="editor-footer__note">入力内容はまだこのブラウザ内の下書きです。「公開する」で data.json を GitHub にコミットすると、1〜2分後に閲覧用サイトに反映されます。</p>
+
+        <details class="token-field" id="tokenDetails">
+          <summary>GitHub アクセストークンを設定</summary>
+          <p class="token-field__help">
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Fine-grained personal access token</a>
+            を発行してください。Repository access は kyosuke0306/portfolio のみ、権限は Contents: Read and write だけで足ります。
+            トークンはこのブラウザの localStorage に保存され、GitHub 以外には送信されません。
+          </p>
+          <input type="password" id="githubToken" placeholder="github_pat_..." autocomplete="off" spellcheck="false" />
+          <div class="editor-footer__actions">
+            <button class="btn btn--ghost" id="saveTokenBtn" type="button">トークンを保存</button>
+            <button class="btn btn--ghost" id="clearTokenBtn" type="button">トークンを削除</button>
+          </div>
+        </details>
+
         <div class="editor-footer__actions">
+          <button class="btn btn--accent" id="publishBtn" type="button">公開する</button>
           <button class="btn btn--ghost" id="exportDataBtn" type="button">JSONを書き出し</button>
           <button class="btn btn--ghost" id="importDataBtn" type="button">JSONを読み込み</button>
           <input type="file" id="importDataInput" accept="application/json,.json" hidden />
         </div>
+
+        <p class="publish-status" id="publishStatus" role="status" aria-live="polite"></p>
       </div>
     </div>
   </div>

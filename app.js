@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   "use strict";
 
   if ("scrollRestoration" in history) {
@@ -7,46 +7,17 @@
   window.scrollTo(0, 0);
 
   const STORAGE_KEY = "portfolio.data.v1";
+  const DATA_URL = "data.json";
 
+  // 表示内容の実データは data.json が唯一の情報源。
+  // これは data.json を読み込めなかった場合にだけ使う空の骨組み。
   const defaultData = {
-    profile: {
-      name: "井川　恭輔",
-      title: "フロントエンドエンジニア",
-      bio: "システムエンジニアです。",
-      avatar: null,
-    },
-    skills: [
-      { label: "フロントエンド開発", status: "current", date: "", month: "", note: "" },
-      { label: "UI / UX デザイン", status: "current", date: "", month: "", note: "" },
-      { label: "ユーザー視点での設計", status: "current", date: "", month: "", note: "" },
-      { label: "課題解決力", status: "current", date: "", month: "", note: "" },
-    ],
-    personality: [
-      { label: "誠実", status: "current", date: "", month: "", note: "" },
-      { label: "粘り強い", status: "current", date: "", month: "", note: "" },
-      { label: "好奇心旺盛", status: "current", date: "", month: "", note: "" },
-    ],
-    certifications: [
-      { label: "ITパスポート", status: "current", date: "2022", month: "", note: "" },
-      { label: "基本情報技術者試験（FE）", status: "current", date: "2023", month: "", note: "" },
-    ],
-    career: [
-      { startYear: "2025", startMonth: "4", endYear: "2026", endMonth: "3", role: "エンジニア", org: "パーソルエクセルHRパートナーズ株式会社", status: "current", note: "" },
-      { startYear: "2026", startMonth: "4", endYear: "present", endMonth: "", role: "フロントエンドエンジニア", org: "島精機製作所株式会社", status: "current", note: "" },
-    ],
-    projects: [
-      {
-        title: "サンプル作品",
-        description: "作品の概要や制作背景をここに入力します。プログラムでもイラストでも構いません。",
-        tech: ["Web開発", "React"],
-        link: "",
-        thumbnail: null,
-        status: "current",
-        date: "2024",
-        month: "",
-        note: "",
-      },
-    ],
+    profile: { name: "", title: "", bio: "", avatar: null },
+    skills: [],
+    personality: [],
+    certifications: [],
+    career: [],
+    projects: [],
   };
 
   const YEAR_RANGE_FUTURE = 15;
@@ -186,17 +157,24 @@
     };
   }
 
-  function loadData() {
+  // 公開済みデータ。閲覧ページはこれをそのまま表示する。
+  async function fetchPublishedData() {
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`${DATA_URL}: HTTP ${res.status}`);
+    return normalizeData(await res.json());
+  }
+
+  // 編集ページの作業中データ。公開前の下書きを localStorage に保持する。
+  function loadDraft() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return structuredClone(defaultData);
-      return normalizeData(JSON.parse(raw));
+      return raw ? normalizeData(JSON.parse(raw)) : null;
     } catch {
-      return structuredClone(defaultData);
+      return null;
     }
   }
 
-  let state = loadData();
+  let state = structuredClone(defaultData);
 
   function persist() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -494,11 +472,23 @@
   // Init (view)
   // ============================================
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  const overlay = document.getElementById("editorOverlay");
+
+  let published = null;
+  try {
+    published = await fetchPublishedData();
+  } catch (err) {
+    console.error("公開データを読み込めませんでした:", err);
+  }
+
+  // 編集ページでは未公開の下書きを優先し、無ければ公開データから始める。
+  const draft = overlay ? loadDraft() : null;
+  state = draft || published || structuredClone(defaultData);
   renderAll();
 
   // 閲覧専用ページ（index.html）には編集UIが無いので、ここで終了する。
   // 編集UIを含むのはローカル専用の edit.html のみ。
-  const overlay = document.getElementById("editorOverlay");
   if (!overlay) return;
 
   // ============================================
@@ -528,6 +518,104 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && overlay.classList.contains("open")) closeEditor();
+  });
+
+  // ============================================
+  // EDITOR: publish to GitHub
+  // ============================================
+  const GITHUB_REPO = "kyosuke0306/portfolio";
+  const GITHUB_BRANCH = "main";
+  const TOKEN_KEY = "portfolio.githubToken";
+
+  const publishBtn = document.getElementById("publishBtn");
+  const publishStatus = document.getElementById("publishStatus");
+  const tokenDetails = document.getElementById("tokenDetails");
+  const tokenInput = document.getElementById("githubToken");
+  const saveTokenBtn = document.getElementById("saveTokenBtn");
+  const clearTokenBtn = document.getElementById("clearTokenBtn");
+
+  tokenInput.value = localStorage.getItem(TOKEN_KEY) || "";
+
+  function setPublishStatus(message, kind) {
+    publishStatus.textContent = message;
+    publishStatus.className = "publish-status" + (kind ? ` publish-status--${kind}` : "");
+  }
+
+  saveTokenBtn.addEventListener("click", () => {
+    const token = tokenInput.value.trim();
+    if (!token) {
+      setPublishStatus("トークンが空です。", "error");
+      return;
+    }
+    localStorage.setItem(TOKEN_KEY, token);
+    tokenDetails.open = false;
+    setPublishStatus("トークンを保存しました。", "ok");
+  });
+
+  clearTokenBtn.addEventListener("click", () => {
+    localStorage.removeItem(TOKEN_KEY);
+    tokenInput.value = "";
+    setPublishStatus("トークンを削除しました。", "ok");
+  });
+
+  function toBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary = "";
+    bytes.forEach((b) => { binary += String.fromCharCode(b); });
+    return btoa(binary);
+  }
+
+  async function githubRequest(path, options = {}) {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/${path}`, {
+      ...options,
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+      },
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.message || `HTTP ${res.status}`);
+    return body;
+  }
+
+  publishBtn.addEventListener("click", async () => {
+    if (!localStorage.getItem(TOKEN_KEY)) {
+      tokenDetails.open = true;
+      setPublishStatus("先に GitHub アクセストークンを設定してください。", "error");
+      return;
+    }
+
+    publishBtn.disabled = true;
+    setPublishStatus("公開中…");
+
+    try {
+      // 既存ファイルの sha が無いと更新できない。ファイルが無い場合は新規作成扱い。
+      let sha;
+      try {
+        const current = await githubRequest(`contents/${DATA_URL}?ref=${GITHUB_BRANCH}`);
+        sha = current.sha;
+      } catch (err) {
+        if (!/not found/i.test(err.message)) throw err;
+      }
+
+      await githubRequest(`contents/${DATA_URL}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          message: "Update portfolio content from the editor",
+          content: toBase64(JSON.stringify(state, null, 2) + "\n"),
+          branch: GITHUB_BRANCH,
+          ...(sha ? { sha } : {}),
+        }),
+      });
+
+      setPublishStatus("公開しました。1〜2分後に閲覧用サイトへ反映されます。", "ok");
+    } catch (err) {
+      setPublishStatus(`公開に失敗しました: ${err.message}`, "error");
+    } finally {
+      publishBtn.disabled = false;
+    }
   });
 
   // ============================================
