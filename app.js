@@ -10,9 +10,9 @@
 
   const defaultData = {
     profile: {
-      name: "山田 太郎",
+      name: "井川　恭輔",
       title: "フロントエンドエンジニア",
-      bio: "複雑な課題をシンプルで洗練されたUIに変えることにやりがいを感じています。編集画面から、あなただけのプロフィールを作成してみましょう。",
+      bio: "システムエンジニアです。",
       avatar: null,
     },
     skills: [
@@ -31,8 +31,8 @@
       { label: "基本情報技術者試験（FE）", status: "current", date: "2023", month: "", note: "" },
     ],
     career: [
-      { startYear: "2020", startMonth: "4", endYear: "2022", endMonth: "3", role: "ジュニアデベロッパー", org: "スタートアップ株式会社", status: "current", note: "" },
-      { startYear: "2022", startMonth: "4", endYear: "present", endMonth: "", role: "フロントエンドエンジニア", org: "テック株式会社", status: "current", note: "" },
+      { startYear: "2025", startMonth: "4", endYear: "2026", endMonth: "3", role: "エンジニア", org: "パーソルエクセルHRパートナーズ株式会社", status: "current", note: "" },
+      { startYear: "2026", startMonth: "4", endYear: "present", endMonth: "", role: "フロントエンドエンジニア", org: "島精機製作所株式会社", status: "current", note: "" },
     ],
     projects: [
       {
@@ -587,7 +587,7 @@
     renderProfile();
   }
 
-  inputName.addEventListener("input", () => updateProfileField("name", inputName.value.trim() || "山田 太郎"));
+  inputName.addEventListener("input", () => updateProfileField("name", inputName.value.trim() || defaultData.profile.name));
   inputTitle.addEventListener("input", () => updateProfileField("title", inputTitle.value.trim()));
   inputBio.addEventListener("input", () => updateProfileField("bio", inputBio.value));
 
