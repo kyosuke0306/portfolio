@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>予定スケジュール | ポートフォリオ</title>
+<meta name="robots" content="noindex" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="logo">Schedule<span class="dot">.</span></span>
+    <nav class="site-nav site-nav--always">
+      <a href="index.html">ポートフォリオへ戻る</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="schedule" id="schedule">
+      <h2 class="section-title">予定スケジュール</h2>
+
+      <p class="schedule-lead">
+        予定はこのブラウザの中だけに保存されます。<code>data.json</code> には入らず、公開サイトにも出ません。
+        端末を移すときは下部の「JSONを書き出し / 読み込み」を使ってください。
+      </p>
+
+      <div class="schedule-summary" id="scheduleSummary"></div>
+
+      <div class="schedule-layout">
+
+        <!-- CALENDAR -->
+        <div class="calendar-pane">
+          <div class="calendar-head">
+            <button type="button" class="icon-action" id="prevMonthBtn" aria-label="前の月">&larr;</button>
+            <h3 class="calendar-title" id="calendarTitle"></h3>
+            <button type="button" class="icon-action" id="nextMonthBtn" aria-label="次の月">&rarr;</button>
+            <button type="button" class="btn btn--ghost calendar-today" id="todayBtn">今日</button>
+          </div>
+
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span class="is-sun">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="is-sat">土</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+
+          <ul class="calendar-legend">
+            <li><i class="cat-dot cat-dot--work"></i>仕事</li>
+            <li><i class="cat-dot cat-dot--study"></i>学習</li>
+            <li><i class="cat-dot cat-dot--private"></i>私用</li>
+            <li><i class="cat-dot cat-dot--other"></i>その他</li>
+          </ul>
+        </div>
+
+        <!-- ADD FORM -->
+        <div class="schedule-pane">
+          <h3 class="block-title">予定を追加</h3>
+          <form class="add-form add-form--schedule" id="scheduleForm">
+            <input type="text" id="eventTitle" maxlength="80" placeholder="予定の内容" required />
+            <div class="form-row">
+              <input type="date" id="eventDate" required aria-label="日付" />
+              <select id="eventCategory" aria-label="分類"></select>
+            </div>
+            <div class="form-row">
+              <input type="time" id="eventStart" aria-label="開始時刻" />
+              <span class="period-sep">〜</span>
+              <input type="time" id="eventEnd" aria-label="終了時刻" />
+              <span class="form-hint">時刻を空欄にすると終日の予定になります</span>
+            </div>
+            <textarea id="eventNote" rows="2" maxlength="300" placeholder="メモ（任意）"></textarea>
+            <button type="submit" class="btn btn--accent">追加</button>
+          </form>
+          <p class="publish-status" id="scheduleStatus" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="schedule-list-head">
+        <div class="segmented" id="rangeTabs" role="tablist" aria-label="表示する範囲">
+          <button type="button" class="segmented-btn active" data-range="day" role="tab">選んだ日</button>
+          <button type="button" class="segmented-btn" data-range="upcoming" role="tab">今日以降</button>
+          <button type="button" class="segmented-btn" data-range="all" role="tab">すべて</button>
+        </div>
+        <div class="schedule-filters">
+          <input type="search" id="searchInput" placeholder="キーワードで絞り込み" aria-label="キーワードで絞り込み" />
+          <select id="statusFilter" aria-label="完了状態で絞り込み">
+            <option value="all">すべての状態</option>
+            <option value="open">未完了だけ</option>
+            <option value="done">完了だけ</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 class="schedule-list-title" id="listTitle"></h3>
+      <ul class="event-list" id="eventList"></ul>
+
+      <div class="schedule-footer-actions">
+        <button class="btn btn--ghost" id="exportBtn" type="button">JSONを書き出し</button>
+        <button class="btn btn--ghost" id="importBtn" type="button">JSONを読み込み</button>
+        <input type="file" id="importInput" accept="application/json,.json" hidden />
+        <button class="btn btn--ghost" id="clearAllBtn" type="button">全て削除</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> 井川　恭輔. Vanilla HTML / CSS / JS で制作。</p>
+  </footer>
+
+  <script src="schedule.js"></script>
+</body>
+</html>
